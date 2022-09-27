@@ -9,16 +9,9 @@ class UserController
 {
     private UserRepository $userRepository;
 
-    private string $mapping = 'user';
-
     public function __construct()
     {
         $this->userRepository = new UserRepository();
-    }
-
-    public function getMapping(): string
-    {
-        return $this->mapping;
     }
 
     public function getAll(): string

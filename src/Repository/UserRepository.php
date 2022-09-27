@@ -10,17 +10,18 @@ use PDO;
 
 class UserRepository
 {
-    private string $SQL_SELECT_ALL = "SELECT * FROM user";
-    private string $SQL_SELECT_BY_EMAIL = "SELECT * FROM user WHERE email = :email";
-    private string $SQL_INSERT = "INSERT INTO user (email, name, gender, status) VALUE (:email, :name, :gender, :status)";
-    private string $SQL_UPDATE = "UPDATE user SET name = :name, gender = :gender, status = :status WHERE email = :email";
-    private string $SQL_DELETE = "DELETE FROM user WHERE email = :email";
+    private string $SQL_SELECT_ALL = 'SELECT * FROM user';
+    private string $SQL_SELECT_BY_EMAIL = 'SELECT * FROM user WHERE email = :email';
+    private string $SQL_INSERT = 'INSERT INTO user (email, name, gender, status) VALUE (:email, :name, :gender, :status)';
+    private string $SQL_UPDATE = 'UPDATE user SET name = :name, gender = :gender, status = :status WHERE email = :email';
+    private string $SQL_DELETE = 'DELETE FROM user WHERE email = :email';
 
     private ConnectionFactory $connectionFactory;
 
     public function __construct()
     {
-        $this->connectionFactory = ConnectionFactory::getInstance();
+        //$this->connectionFactory = ConnectionFactory::getInstance();
+        $this->connectionFactory = new ConnectionFactory();
     }
 
     public function findAll(): array
@@ -34,14 +35,14 @@ class UserRepository
 
             $result = [];
             foreach ($stmt->fetchAll() as $item) {
-                $result[] = UserMapper::map($item);
+                $result[] = UserMapper::toEntity($item);
             }
             $connection = null;
 
             return $result;
         } catch (ConnectionException $e) {
-            echo $e->getMessage();
-            die(); //TODO Handle exception
+            // echo $e->getMessage();
+            die(); // TODO Handle exception
         }
     }
 
@@ -60,9 +61,9 @@ class UserRepository
 
             $connection = null;
 
-            return UserMapper::map($result[0]);
+            return UserMapper::toEntity($result[0]);
         } catch (ConnectionException $e) {
-            die(); //TODO Handle exception
+            die(); // TODO Handle exception
         }
     }
 
@@ -87,7 +88,7 @@ class UserRepository
 
             return $toAdd;
         } catch (ConnectionException $e) {
-            die(); //TODO Handle exception
+            die(); // TODO Handle exception
         }
     }
 
@@ -112,7 +113,7 @@ class UserRepository
 
             return $toUpdate;
         } catch (ConnectionException $e) {
-            die(); //TODO Handle exception
+            die(); // TODO Handle exception
         }
     }
 
@@ -127,7 +128,7 @@ class UserRepository
 
             $connection = null;
         } catch (ConnectionException $e) {
-            die(); //TODO Handle exception
+            die(); // TODO Handle exception
         }
     }
 }

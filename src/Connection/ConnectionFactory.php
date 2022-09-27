@@ -8,7 +8,7 @@ use PDOException;
 
 class ConnectionFactory
 {
-    private static ?ConnectionFactory $instance = null;
+//    private static ?ConnectionFactory $instance = null;
 
     private string $PATH_TO_CONFIG = __DIR__ . '/db_config.json';
 
@@ -20,7 +20,7 @@ class ConnectionFactory
 
     private string $PASSWORD;
 
-    private function __construct()
+    public function __construct()
     {
         $fileContents = json_decode(file_get_contents($this->PATH_TO_CONFIG), true);
         $this->SERVER_NAME = $fileContents['servername'];
@@ -29,21 +29,14 @@ class ConnectionFactory
         $this->PASSWORD = $fileContents['password'];
     }
 
-//    private function __clone()
+//    public static function getInstance(): ConnectionFactory
 //    {
+//        if (is_null(self::$instance)) {
+//            self::$instance = new ConnectionFactory();
+//        }
+//
+//        return self::$instance;
 //    }
-//    private function __wakeup()
-//    {
-//    }
-
-    public static function getInstance(): ConnectionFactory
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new ConnectionFactory();
-        }
-
-        return self::$instance;
-    }
 
     /**
      * @throws ConnectionException
@@ -52,14 +45,16 @@ class ConnectionFactory
     {
         try {
             $connection = new PDO(
-                "mysql:host=" . $this->SERVER_NAME . ";dbname=" . $this->DB_NAME,
+                'mysql:host=' . $this->SERVER_NAME . ';dbname=' . $this->DB_NAME,
                 $this->USER_NAME,
                 $this->PASSWORD
             );
             $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
             return $connection;
         } catch (PDOException $e) {
             $problem = $e->getMessage();
+
             throw new ConnectionException("Unable to get connection to database, cause: $problem", 0, $e);
         }
     }

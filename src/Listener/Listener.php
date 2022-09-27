@@ -25,16 +25,16 @@ class Listener
     {
         set_time_limit(0);
 
-        $sock = socket_create(AF_INET, SOCK_STREAM, 0) or die('Im dead');
+        $sock = socket_create(AF_INET, SOCK_STREAM, 0) or die('Unable to create socket');
 
-        $result = socket_bind($sock, $this->HOST, $this->PORT) or die('Im dead');
+        $result = socket_bind($sock, $this->HOST, $this->PORT) or die('Unable to bind socket');
         echo "Listening to $this->HOST:$this->PORT\r\n";
         while (true) {
             $result = socket_listen($sock, 3) or die('Im dead');
             $spawn = socket_accept($sock) or die('Im dead');
             $input = socket_read($spawn, 1024) or die('Im dead');
 
-            echo "Received following: \r\n$input\r\n";
+            //echo "Received following: \r\n$input\r\n";
 
             $response = $this->dispatcher->dispatch($input);
 

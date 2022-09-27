@@ -25,7 +25,7 @@ class Dispatcher
         $head = $splitRequest[0];
         $chunks = preg_split('/\s/', $head);
         $result['method'] = $chunks[0];
-        $result['path'] = preg_split('/\//', $chunks[1]);
+        //$result['path'] = preg_split('/\//', $chunks[1]);
 
         $result['body'] = array_pop($splitRequest);
 
@@ -40,32 +40,36 @@ class Dispatcher
 
     public function dispatch(string $request): string
     {
-        $info = $this->parseRequest($request);
+        $requestData = $this->parseRequest($request);
         $responseBody = '';
 
-        switch ($info['method']) {
+        switch ($requestData['method']) {
             case 'GET': {
-                if ($info['body'] != null) {
-                    $responseBody = $this->userController->getOne($info['body']['email']);
+                if ($requestData['body'] != null) {
+                    $responseBody = $this->userController->getOne($requestData['body']['email']);
                 } else {
                     $responseBody = $this->userController->getAll();
                 }
+
                 break;
             }
             case 'POST': {
-                $responseBody = $this->userController->add(UserMapper::map($info['body']));
+                $responseBody = $this->userController->add(UserMapper::toEntity($requestData['body']));
+
                 break;
             }
             case 'PUT': {
-                $responseBody = $this->userController->update(UserMapper::map($info['body']));
+                $responseBody = $this->userController->update(UserMapper::toEntity($requestData['body']));
+
                 break;
             }
             case 'DELETE': {
-                $this->userController->delete($info['body']);
+                $this->userController->delete($requestData['body']);
+
                 break;
             }
             default: {
-                die();
+                die();// TODO throw exception here
             }
         }
 
@@ -73,7 +77,7 @@ class Dispatcher
     }
 
     private function constructHttpResponse(string $body = null): string
-    { //TODO figure out correct http response
+    { // TODO figure out correct http response
         $response = "HTTP/1.1 200 OK\r\nConnection: Closed\r\nContent-Type: application/json\r\n\r\n$body";
         //echo $response;
         return $response;

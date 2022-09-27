@@ -8,7 +8,7 @@ use App\Entity\User;
 
 class UserMapper
 {
-    public static function map(array $toMap): User
+    public static function toEntity(array $toMap): User
     {
         $user = new User();
         $user->setEmail($toMap['email']);
