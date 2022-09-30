@@ -35,6 +35,14 @@ class Dispatcher
             $result['body'] = null;
         }
 
+        if ($result['method'] == 'OPTIONS') {
+            foreach ($splitRequest as $line) {
+                if (preg_split('/\:\s/', $line)[0] == 'Access-Control-Request-Method') {
+                    $result['method'] = preg_split('/\:\s/', $line)[1];
+                }
+            }
+        }
+
         return $result;
     }
 
@@ -64,7 +72,7 @@ class Dispatcher
                 break;
             }
             case 'DELETE': {
-                $this->userController->delete($requestData['body']);
+                $this->userController->delete($requestData['body']['email']);
 
                 break;
             }
@@ -73,13 +81,13 @@ class Dispatcher
             }
         }
 
-        return $this->constructHttpResponse($responseBody);
+        return $responseBody;
     }
 
-    private function constructHttpResponse(string $body = null): string
-    { // TODO figure out correct http response
-        $response = "HTTP/1.1 200 OK\r\nConnection: Closed\r\nContent-Type: application/json\r\n\r\n$body";
-        //echo $response;
-        return $response;
-    }
+//    private function constructHttpResponse(string $body = null): string
+//    { // TODO figure out correct http response
+//        $response = "HTTP/1.1 200 OK\r\nConnection: Closed\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\n\r\n$body";
+//        //echo $response;
+//        return $response;
+//    }
 }

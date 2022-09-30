@@ -34,7 +34,7 @@ class Listener
             $spawn = socket_accept($sock) or die('Im dead');
             $input = socket_read($spawn, 1024) or die('Im dead');
 
-            //echo "Received following: \r\n$input\r\n";
+            echo "Received following: \r\n$input\r\n";
 
             $response = $this->dispatcher->dispatch($input);
 
