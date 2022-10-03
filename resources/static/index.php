@@ -34,9 +34,11 @@
 
         <p id="edit_warning" style="display: none">Now editing. Clear form to cancel editing</p>
 
+        <p id="input_warning" style="display: none; color: #4f1100"></p>
+
         <div style="display: flex; flex-direction: row; margin-top: 20px; justify-content: center">
-            <button type="submit" class="btn btn-outline-success" style="margin-right: 5px; width: 40%">Submit</button>
-            <button onclick="exitEditMode()" type="reset" class="btn btn-outline-danger" style="margin-left: 5px; width: 40%">Clear form</button>
+            <button onclick="return checkInput()" type="submit" class="btn btn-outline-success" style="margin-right: 5px; width: 40%">Submit</button>
+            <button onclick="resetForm()" type="reset" class="btn btn-outline-danger" style="margin-left: 5px; width: 40%">Clear form</button>
         </div>
     </form>
 </div>
@@ -69,7 +71,7 @@
                     <td id='status'>" . ucfirst(strtolower($entry['status'])) . "</td>
                     <td>
                         <form action='handlers/deleteHandler.php' style='display: flex; flex-direction: row; width: inherit' method='POST'>
-                        <button onclick='fillForEdit(this)' value='" . $entry['email'] . "'
+                        <button type='button' onclick='fillForEdit(this)' value='" . $entry['email'] . "'
                         class='btn btn-outline-warning' style='margin: 5px; width=40%'>Edit</button>
                         <button type='submit' value='" . $entry['email'] . "' name='delete'
                         onclick='return confirm(\"This action cannot be undone. Proceed?\")'
@@ -93,7 +95,6 @@
         let cells = row.children;
         document.getElementById('email_field').value = rowName;
         for (const cell of cells) {
-            //console.log(cell.innerHTML);
             if (cell.id === 'name') {
                 document.getElementById('name_field').value = cell.innerHTML;
             } else if (cell.id === 'gender') {
@@ -117,12 +118,43 @@
         }
     }
 
-    function exitEditMode() {
+    function resetForm() {
         document.getElementById('edit').value = 0;
         let x = document.getElementById("edit_warning");
+        let y = document.getElementById('input_warning');
         if (x.style.display === "block") {
             x.style.display = "none";
         }
+        if (y.style.display === "block") {
+            y.style.display = "none";
+        }
+    }
+
+    function showWarningMessage(message) {
+        let x = document.getElementById('input_warning');
+        x.innerHTML = message;
+        if (x.style.display === 'none') {
+            x.style.display = 'block';
+        }
+    }
+
+    function checkInput() {
+        let email = document.getElementById('email_field').value;
+        let name = document.getElementById('name_field').value;
+        let warningText = '';
+
+        if (email == null || email === '' || name == null || name === '') {
+            warningText += 'All fields must be filled';
+            showWarningMessage(warningText);
+            return false;
+        } else if (!email.match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        )) {
+            warningText += 'Invalid email';
+            showWarningMessage(warningText);
+            return false;
+        }
+        return true;
     }
 </script>
 

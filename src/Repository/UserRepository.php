@@ -20,7 +20,6 @@ class UserRepository
 
     public function __construct()
     {
-        //$this->connectionFactory = ConnectionFactory::getInstance();
         $this->connectionFactory = new ConnectionFactory();
     }
 

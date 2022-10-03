@@ -29,15 +29,6 @@ class ConnectionFactory
         $this->PASSWORD = $fileContents['password'];
     }
 
-//    public static function getInstance(): ConnectionFactory
-//    {
-//        if (is_null(self::$instance)) {
-//            self::$instance = new ConnectionFactory();
-//        }
-//
-//        return self::$instance;
-//    }
-
     /**
      * @throws ConnectionException
      */
@@ -55,7 +46,7 @@ class ConnectionFactory
         } catch (PDOException $e) {
             $problem = $e->getMessage();
 
-            throw new ConnectionException("Unable to get connection to database, cause: $problem", 0, $e);
+            throw new ConnectionException("Unable to get connection to database, cause: $problem", 403, $e);
         }
     }
 }

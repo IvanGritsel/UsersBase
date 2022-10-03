@@ -3,6 +3,7 @@
 namespace App\Dispatcher;
 
 use App\Controller\UserController;
+use App\Exception\ConnectionException;
 use App\Mapper\UserMapper;
 
 class Dispatcher
@@ -12,6 +13,53 @@ class Dispatcher
     public function __construct()
     {
         $this->userController = new UserController();
+    }
+
+    public function dispatch(string $request): string
+    {
+        $requestData = $this->parseRequest($request);
+        $responseBody = '';
+
+        try {
+            switch ($requestData['method']) {
+                case 'GET':
+                    {
+                        if ($requestData['body'] != null) {
+                            $responseBody = $this->userController->getOne($requestData['body']['email']);
+                        } else {
+                            $responseBody = $this->userController->getAll();
+                        }
+
+                        break;
+                    }
+                case 'POST':
+                    {
+                        $responseBody = $this->userController->add(UserMapper::toEntity($requestData['body']));
+
+                        break;
+                    }
+                case 'PUT':
+                    {
+                        $responseBody = $this->userController->update(UserMapper::toEntity($requestData['body']));
+
+                        break;
+                    }
+                case 'DELETE':
+                    {
+                        $this->userController->delete($requestData['body']['email']);
+
+                        break;
+                    }
+                default:
+                    {
+                        die();// TODO throw exception here
+                    }
+            }
+
+            return $responseBody;
+        } catch (ConnectionException $e) {
+            return json_encode($e);
+        }
     }
 
     private function parseRequest(string $request): array
@@ -44,44 +92,6 @@ class Dispatcher
         }
 
         return $result;
-    }
-
-    public function dispatch(string $request): string
-    {
-        $requestData = $this->parseRequest($request);
-        $responseBody = '';
-
-        switch ($requestData['method']) {
-            case 'GET': {
-                if ($requestData['body'] != null) {
-                    $responseBody = $this->userController->getOne($requestData['body']['email']);
-                } else {
-                    $responseBody = $this->userController->getAll();
-                }
-
-                break;
-            }
-            case 'POST': {
-                $responseBody = $this->userController->add(UserMapper::toEntity($requestData['body']));
-
-                break;
-            }
-            case 'PUT': {
-                $responseBody = $this->userController->update(UserMapper::toEntity($requestData['body']));
-
-                break;
-            }
-            case 'DELETE': {
-                $this->userController->delete($requestData['body']['email']);
-
-                break;
-            }
-            default: {
-                die();// TODO throw exception here
-            }
-        }
-
-        return $responseBody;
     }
 
 //    private function constructHttpResponse(string $body = null): string
